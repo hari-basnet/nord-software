@@ -1,4 +1,5 @@
 import React from 'react';
+import '../App.css';
 import {
   Table,
   TableBody,
@@ -7,57 +8,86 @@ import {
   TableRow,
   TableRowColumn,
 } from 'material-ui/Table';
+import EditIcon from 'material-ui/svg-icons/image/edit';
+import TrashIcon from 'material-ui/svg-icons/action/delete';
+import CheckIcon from 'material-ui/svg-icons/navigation/check';
+import TextField from 'material-ui/TextField';
 
-const row = (x, i, header) => (
-  <TableRow key = {i}>
+import InlineForm from './InlineForm';
+
+
+
+
+
+const row = (x,
+  i,
+  header,
+  handleRemove,
+  startEditing,
+  editIdx,
+  handleChange,
+  stopEditing,
+) => {
+  const currentlyEditing = editIdx === i;
+  return (currentlyEditing ? <InlineForm/> :
+  <TableRow key = {`tr-${i}`} selectable={false}>
     {
       header.map((y, k) => //y is the header
         <TableRowColumn key={`trc-${k}`}>
-          {x[y.prop]}
+          {currentlyEditing ? <TextField
+            name={y.prop}
+            onChange={e => handleChange(e, y.prop, i)}
+            value= {x[y.prop]}
+                              />
+
+          :x[y.prop]}
         </TableRowColumn>
       )}
+    <TableRowColumn>
+      {currentlyEditing ? (
+        <CheckIcon onClick={()=>stopEditing()}/>
+      ) :(
+        <EditIcon id= "editButton"onClick={()=> startEditing(i)}/>
+      )}
+      <TrashIcon onclick={()=> handleRemove(i)}/>
+    </TableRowColumn>
+
   </TableRow>
 
-)
+);
+}
 
-export default  ({data, header}) =>
+export default  ({
+  data,
+  header,
+  handleRemove,
+  startEditing,
+  editIdx,
+  handleChange,
+  stopEditing,
+}) =>
   <Table>
     <TableHeader>
       <TableRow>
         {
           header.map((x, i) =>
-            <TableHeaderColumn key={i}>{x.name}</TableHeaderColumn>)
-        }
+            <TableHeaderColumn key={i}> {x.name}</TableHeaderColumn>
+          )}
+
+        <TableHeaderColumn/>
 
       </TableRow>
     </TableHeader>
     <TableBody>
-      {data.map((x, i) => row(x, i, header))}
+      {data.map((x, i) => row(x,
+        i,
+        header,
+        handleRemove,
+        startEditing,
+        editIdx,
+        handleChange,
+        stopEditing,
+      ))}
 
-      {/* <TableRow>
-        <TableRowColumn>1</TableRowColumn>
-        <TableRowColumn>John Smith</TableRowColumn>
-        <TableRowColumn>Employed</TableRowColumn>
-        </TableRow>
-        <TableRow>
-        <TableRowColumn>2</TableRowColumn>
-        <TableRowColumn>Randal White</TableRowColumn>
-        <TableRowColumn>Unemployed</TableRowColumn>
-        </TableRow>
-        <TableRow>
-        <TableRowColumn>3</TableRowColumn>
-        <TableRowColumn>Stephanie Sanders</TableRowColumn>
-        <TableRowColumn>Employed</TableRowColumn>
-        </TableRow>
-        <TableRow>
-        <TableRowColumn>4</TableRowColumn>
-        <TableRowColumn>Steve Brown</TableRowColumn>
-        <TableRowColumn>Employed</TableRowColumn>
-        </TableRow>
-        <TableRow>
-        <TableRowColumn>5</TableRowColumn>
-        <TableRowColumn>Christopher Nolan</TableRowColumn>
-        <TableRowColumn>Unemployed</TableRowColumn>
-      </TableRow> */}
     </TableBody>
   </Table>
